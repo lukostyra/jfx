@@ -48,6 +48,10 @@ import com.sun.javafx.sg.prism.NGParallelCamera;
  * @since JavaFX 2.0
  */
 public class ParallelCamera extends Camera {
+
+    private boolean useNearClipProperty = false;
+    private boolean useFarClipProperty = false;
+
     static {
         ParallelCameraHelper.setParallelCameraAccessor(new ParallelCameraHelper.ParallelCameraAccessor() {
             @Override
@@ -76,6 +80,16 @@ public class ParallelCamera extends Camera {
         return c;
     }
 
+    @Override
+    protected final void nearClipInvalidated() {
+        useNearClipProperty = true;
+    }
+
+    @Override
+    protected final void farClipInvalidated() {
+        useFarClipProperty = true;
+    }
+
     /*
      * Note: This method MUST only be called via its accessor method.
      */
@@ -100,7 +114,16 @@ public class ParallelCamera extends Camera {
         final double halfDepth =
                 (viewWidth > viewHeight) ? viewWidth / 2.0 : viewHeight / 2.0;
 
-        proj.ortho(0.0, viewWidth, viewHeight, 0.0, -halfDepth, halfDepth);
+        double nearClip = -halfDepth;
+        double farClip = halfDepth;
+        if (useNearClipProperty) {
+            nearClip = getNearClip();
+        }
+        if (useFarClipProperty) {
+            farClip = getFarClip();
+        }
+
+        proj.ortho(0.0, viewWidth, viewHeight, 0.0, nearClip, farClip);
     }
 
     @Override

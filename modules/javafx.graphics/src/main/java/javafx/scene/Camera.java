@@ -190,6 +190,10 @@ public abstract class Camera extends Node {
     private boolean localToSceneValid = false;
     private boolean sceneToLocalValid = false;
 
+    // no-ops, to be overriden by subclasses (see ParallelCamera)
+    protected void nearClipInvalidated() {}
+    protected void farClipInvalidated() {}
+
     double getFarClipInScene() {
         updateClipPlane();
         return farClipInScene;
@@ -256,6 +260,7 @@ public abstract class Camera extends Node {
             nearClip = new SimpleDoubleProperty(Camera.this, "nearClip", 0.1) {
                 @Override
                 protected void invalidated() {
+                    nearClipInvalidated();
                     clipInSceneValid = false;
                     NodeHelper.markDirty(Camera.this, DirtyBits.NODE_CAMERA);
                 }
@@ -291,6 +296,7 @@ public abstract class Camera extends Node {
             farClip = new SimpleDoubleProperty(Camera.this, "farClip", 100.0) {
                 @Override
                 protected void invalidated() {
+                    farClipInvalidated();
                     clipInSceneValid = false;
                     NodeHelper.markDirty(Camera.this, DirtyBits.NODE_CAMERA);
                 }
